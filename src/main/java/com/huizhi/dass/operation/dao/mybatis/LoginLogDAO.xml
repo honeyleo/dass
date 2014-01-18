@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huizhi.dass.operation.dao.LoginLogDAO" >
+  <resultMap id="BaseResultMap" type="com.huizhi.dass.model.operation.LoginLog" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="userId" property="userId" jdbcType="VARCHAR" />
+    <result column="gameId" property="gameId" jdbcType="INTEGER" />
+    <result column="channelId" property="channelId" jdbcType="INTEGER" />
+    <result column="deviceId" property="deviceId" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="operateTime" property="operateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="condition.userId != null" >
+         and userId = #{condition.userId}
+      </if>
+      <if test="condition.type != null" >
+         and type = #{condition.type}
+      </if>
+      <if test="condition.gameId != null" >
+         and gameId = #{condition.gameId}
+      </if>
+      <if test="condition.channelId != null" >
+         and channelId = #{condition.channelId}
+      </if>
+      <if test="condition.deviceId != null" >
+         and deviceId = #{condition.deviceId}
+      </if>
+      <if test="condition.startTime != null" >
+         and operateTime &gt;= #{condition.startTime}
+      </if>
+      <if test="condition.endTime != null" >
+         and operateTime &lt; #{condition.endTime}
+      </if>
+      
+    </trim>
+  </sql>
+  
+  <sql id="Example_Order_Clause">
+  	<trim prefix="order by" prefixOverrides="," >
+  		<if test="orderMap.id != null">
+  			,id #{orderMap.id}
+  		</if>
+  		<if test="orderMap.userId != null">
+  			,userId #{orderMap.userId}
+  		</if>
+  		<if test="orderMap.type != null" >
+         and type #{orderMap.type}
+      </if>
+  		<if test="orderMap.gameId != null" >
+         and gameId #{orderMap.gameId}
+      </if>
+  		<if test="orderMap.channelId != null" >
+         and channelId #{orderMap.channelId}
+      </if>
+  		<if test="orderMap.operateTime != null" >
+         and operateTime #{orderMap.operateTime}
+      </if>
+  	</trim>
+  </sql>
+  
+  <sql id="Base_Column_List" >
+    id, userId, type, gameId, channelId, deviceId, operateTime
+  </sql>
+  
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.huizhi.dass.model.Criteria" >
+    select
+    <include refid="Base_Column_List" />
+    from login_log
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="_parameter != null" >
+      <include refid="Example_Order_Clause" />
+    </if>
+    <include refid="common.Mysql_Pagination_Limit" />
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from login_log where id = #{id}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from login_log where id = #{id}
+  </delete>
+  
+  <insert id="insert" parameterType="com.huizhi.dass.model.operation.LoginLog" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into login_log (userId, type, gameId, channelId, deviceId, operateTime)
+    values (#{userId}, #{type}, #{gameId}, #{channelId}, #{deviceId}, #{operateTime})
+  </insert>
+
+  <insert id="insertList">
+    insert into login_log (userId, type, gameId, channelId, deviceId, operateTime)
+    values 
+    <foreach collection="list" index="index" item="item" separator=","> 
+    	(#{item.userId}, #{item.type}, #{item.gameId}, #{item.channelId}, #{item.deviceId}, #{item.operateTime})
+    </foreach>
+    
+    
+  </insert>
+  
+  <select id="countByExample" parameterType="com.huizhi.dass.model.Criteria" resultType="java.lang.Integer" >
+    select count(*) from login_log
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByPrimaryKey" parameterType="com.huizhi.dass.model.operation.LoginLog" >
+    update login_log
+    <set >
+      <if test="userId != null" >
+        userId = #{userId},
+      </if>
+      <if test="type != null" >
+        type = #{type},
+      </if>
+      <if test="gameId != null" >
+        gameId = #{gameId},
+      </if>
+      <if test="channelId != null" >
+        channelId = #{channelId},
+      </if>
+      <if test="deviceId != null" >
+        deviceId = #{deviceId},
+      </if>
+      <if test="operateTime != null" >
+        operateTime = #{operateTime},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  
+  <select id="selectLastLoginLog" resultMap="BaseResultMap" parameterType="com.huizhi.dass.model.operation.LoginLog">
+  	SELECT 
+  		<include refid="Base_Column_List" />
+  	FROM login_log 
+  	WHERE id &lt; #{id}
+  		AND gameId = #{gameId} 
+  		AND channelId = #{channelId} 
+  		AND `type` = #{type} 
+  		AND (userId = #{userId} OR deviceId = #{deviceId}) 
+  	ORDER BY operateTime DESC 
+  		LIMIT 1
+  </select>
+  
+  
+</mapper>

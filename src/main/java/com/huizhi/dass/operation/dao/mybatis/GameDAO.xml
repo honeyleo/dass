@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huizhi.dass.operation.dao.GameDAO" >
+
+	<resultMap id="BaseResultMap" type="com.huizhi.dass.model.operation.Game" >
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="gameId" property="gameId" jdbcType="INTEGER" />
+		<result column="gameName" property="gameName" jdbcType="VARCHAR" />
+		<result column="appSecret" property="appSecret" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectAllGame" resultMap="BaseResultMap">
+		select id, gameId, gameName, appSecret from game
+	</select>
+
+  <sql id="Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="condition.gameId != null" >
+         and gameId = #{condition.gameId}
+      </if>
+      <if test="condition.gameName != null" >
+         and gameName = #{condition.gameName}
+      </if>
+    </trim>
+  </sql>
+
+  
+  <insert id="insertGame" parameterType="com.huizhi.dass.model.operation.Game" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into game (gameId, gameName, appSecret)
+    values (#{gameId}, #{gameName}, #{appSecret})
+  </insert>
+	
+	<select id="selectByExample" resultMap="BaseResultMap"
+		parameterType="com.huizhi.dass.model.Criteria">
+		select id, gameId, gameName, appSecret from game
+		<if test="_parameter != null" >
+	      <include refid="Example_Where_Clause" />
+	    </if>
+	    order by gameId
+		<include refid="common.Mysql_Pagination_Limit" />
+	</select>
+
+	<select id="selectCountByExample" resultType="java.lang.Integer"
+		parameterType="com.huizhi.dass.model.Criteria">
+		select count(id) from game	
+		<if test="_parameter != null" >
+	      <include refid="Example_Where_Clause" />
+	    </if>	
+	</select>
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select id, gameId, gameName, appSecret from game where id=#{id}
+	</select>
+
+	<select id="selectByGameId" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select id, gameId, gameName, appSecret from game where gameId=#{gameId}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from game where id = #{id}
+	</delete>
+	
+	<update id="updateByPrimaryKey" parameterType="com.huizhi.dass.model.operation.Game">
+		update game
+		<set>
+			<if test="gameId != null">
+				gameId = #{gameId},
+			</if>
+			<if test="gameName != null">
+				gameName = #{gameName},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+  
+
+  
+  
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+         http://www.springframework.org/schema/aop/spring-aop.xsd
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/cache
+         http://www.springframework.org/schema/cache/spring-cache.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd
+         http://www.springframework.org/schema/task   
+    	 http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+         
+    <context:mbean-export/>
+    
+    <!-- 缓存管理 启用缓存注解功能 -->
+    <!-- enables scanning for @Cacheable annotation -->
+    <cache:annotation-driven cache-manager="cacheManager"/>
+
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="ehcache"/>
+    </bean>
+
+    <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:ehcache.xml"/>
+    </bean>
+    
+    <!-- 定时器开关 -->
+	<task:annotation-driven />
+	
+	<bean id="retentionTask" class="com.huizhi.dass.operation.task.RechargeTask" />
+	<bean id="rechargeTask" class="com.huizhi.dass.operation.task.RechargeTask" />
+    
+    <!-- 定时统计任务 -->
+    <task:scheduled-tasks>
+        <task:scheduled ref="rechargeTask" method="startEveryDay" cron="0 10 0 * * ?" /> <!-- 每日凌晨0点10分定时执行 -->
+        <task:scheduled ref="retentionTask" method="startEveryDay" cron="0 10 0 * * ?" /> <!-- 每日凌晨0点10分定时执行 -->
+    </task:scheduled-tasks>
+
+
+
+</beans>

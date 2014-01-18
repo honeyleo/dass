@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huizhi.dass.operation.dao.RetentionInfoDAO">
+
+	<resultMap id="BaseResultMap" type="com.huizhi.dass.model.operation.RetentionInfo">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="gameId" property="gameId" jdbcType="INTEGER" />
+		<result column="channelId" property="channelId" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="TINYINT" />
+		<result column="retention" property="retention" jdbcType="DOUBLE" />
+		<result column="date" property="date" jdbcType="DATE" />
+		<result column="gameName" property="gameName" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<insert id="insert" parameterType="com.huizhi.dass.model.operation.Channel">
+		<selectKey resultType="java.lang.Long" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into retention_info (gameId, channelId, type, retention, date)
+		values (#{gameId}, #{channelId}, #{type}, #{retention}, #{date})
+	</insert>
+
+	<sql id="Example_Where_Clause">
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="condition.type != null">
+				and ri.type = #{condition.type}
+			</if>
+			<if test="condition.audit != null">
+				and ri.audit = #{condition.audit}
+			</if>
+			<if test="condition.gameId != null">
+				and ri.gameId = #{condition.gameId}
+			</if>
+			<if test="condition.channelId != null">
+				and ri.channelId = #{condition.channelId}
+			</if>
+			<if test="condition.startTime != null">
+				and ri.date &gt;= #{condition.startTime}
+			</if>
+			<if test="condition.endTime != null">
+				and ri.date &lt; #{condition.endTime}
+			</if>
+
+		</trim>
+	</sql>
+
+	<sql id="Example_Order_Clause">
+		<trim prefix="order by" prefixOverrides=",">
+			<if test="orderMap.id != null">
+				,id #{orderMap.id}
+			</if>
+			<if test="orderMap.userId != null">
+				,userId #{orderMap.userId}
+			</if>
+			<if test="orderMap.type != null">
+				, type #{orderMap.type}
+			</if>
+			<if test="orderMap.gameId != null">
+				, ri.gameId #{orderMap.gameId}
+			</if>
+			<if test="orderMap.channelId != null">
+				, channelId #{orderMap.channelId}
+			</if>
+			<if test="orderMap.date != null">
+				, ri.date 
+				<if test="orderMap.date == false" >
+					false
+				</if>	
+			</if>
+		</trim>
+	</sql>
+
+	<sql id="Base_Column_List">
+		ri.id, ri.gameId, ri.channelId, ri.type, ri.retention, ri.audit, ri.date
+	</sql>
+
+	<select id="selectByExample" resultMap="BaseResultMap"
+		parameterType="com.huizhi.dass.model.Criteria">
+		select
+		<include refid="Base_Column_List" /> ,g.gameName
+		from retention_info ri 
+		left join game g on ri.gameId=g.gameId 
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="_parameter != null">
+			<include refid="Example_Order_Clause" />
+		</if>
+		<include refid="common.Mysql_Pagination_Limit" />
+	</select>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" /> ,g.gameName
+		from retention_info ri
+		left join game g on ri.gameId=g.gameId 
+		where ri.id = #{id}		
+	</select>
+
+	<select id="selectCountByExample" parameterType="com.huizhi.dass.model.Criteria"
+		resultType="java.lang.Integer">
+		select count(*) from retention_info ri
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+
+	<update id="updateByPrimaryKey" parameterType="com.huizhi.dass.model.operation.RetentionInfo">
+		update retention_info
+		<set>
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="gameId != null">
+				gameId = #{gameId},
+			</if>
+			<if test="channelId != null">
+				channelId = #{channelId},
+			</if>
+			<if test="date != null">
+				date = #{date},
+			</if>
+			<if test="retention != null">
+				retention = #{retention},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	
+	<update id="updateAuditByPrimaryKey" parameterType="com.huizhi.dass.model.operation.RetentionInfo">
+		update retention_info
+		<set>
+			<if test="audit != null">
+				audit = #{audit},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+</mapper>

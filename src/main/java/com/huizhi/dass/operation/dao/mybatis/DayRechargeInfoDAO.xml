@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huizhi.dass.operation.dao.DayRechargeInfoDAO" >
+  <resultMap id="BaseResultMap" type="com.huizhi.dass.model.operation.DayRechargeInfo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="gameId" property="gameId" jdbcType="INTEGER" />
+    <result column="channelId" property="channelId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="money" property="money" jdbcType="DECIMAL" />
+    <result column="date" property="date" jdbcType="DATE" />
+    <result column="audit" property="audit" jdbcType="TINYINT" />
+    <result column="audit" property="audit" jdbcType="TINYINT" />
+    <result column="gameName" property="gameName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- 求和条件 -->
+  <sql id="SUM_RECHARGE_LOG_Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="condition.userId != null" >
+         and userId = #{condition.userId}
+      </if>
+      <if test="condition.type != null" >
+         and type = #{condition.type}
+      </if>
+      <if test="condition.gameId != null" >
+         and gameId = #{condition.gameId}
+      </if>
+      <if test="condition.channelId != null" >
+         and channelId = #{condition.channelId}
+      </if>
+      <if test="condition.deviceId != null" >
+         and deviceId = #{condition.deviceId}
+      </if>
+      <if test="condition.startTime != null" >
+         and operateTime &gt;= #{condition.startTime}
+      </if>
+      <if test="condition.endTime != null" >
+         and operateTime &lt; #{condition.endTime}
+      </if>
+      
+    </trim>
+  </sql>
+
+  <sql id="Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="condition.type != null" >
+         and dri.type = #{condition.type}
+      </if>
+      <if test="condition.gameId != null" >
+         and dri.gameId = #{condition.gameId}
+      </if>
+      <if test="condition.audit != null" >
+         and audit = #{condition.audit}
+      </if>
+      <if test="condition.channelId != null" >
+         and channelId = #{condition.channelId}
+      </if>
+      <if test="condition.startTime != null" >
+         and date &gt;= #{condition.startTime}
+      </if>
+      <if test="condition.endTime != null" >
+         and date &lt; #{condition.endTime}
+      </if>
+      
+    </trim>
+  </sql>
+  
+  <sql id="Example_Order_Clause">
+  	<trim prefix="order by" prefixOverrides="," >
+  		<if test="orderMap.id != null">
+  			, dri.id #{orderMap.id}
+  		</if>
+  		<if test="orderMap.userId != null">
+  			,userId #{orderMap.userId}
+  		</if>
+  		<if test="orderMap.type != null" >
+         and type #{orderMap.type}
+      </if>
+  		<if test="orderMap.gameId != null" >
+         and dri.gameId
+      	<if test="orderMap.gameId == false" >
+         	false
+         
+      	</if>   
+      </if>
+      
+  		<if test="orderMap.channelId != null" >
+         and channelId #{orderMap.channelId}
+      </if>
+  		<if test="orderMap.date != null" >
+         and date 
+         <if test="orderMap.date == false" >
+         	false
+      	</if>
+      </if>
+  	</trim>
+  </sql>
+  
+  <sql id="Base_Column_List" >
+    dri.id, dri.type, dri.gameId, channelId, money, dri.date, audit, g.gameName
+  </sql>
+  
+  <!-- 求和 -->
+  <select id="sumByGame" resultMap="BaseResultMap" parameterType="com.huizhi.dass.model.Criteria" >
+    select gameId, channelId, type, SUM(money) as money
+    from recharge_log
+    <if test="_parameter != null" >
+      <include refid="SUM_RECHARGE_LOG_Example_Where_Clause" />
+    </if>
+  </select>
+
+
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.huizhi.dass.model.Criteria" >
+    select
+    <include refid="Base_Column_List" />
+    from day_recharge_info dri left join game g on dri.gameId=g.gameId 
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="_parameter != null" >
+      <include refid="Example_Order_Clause" />
+    </if>
+    <include refid="common.Mysql_Pagination_Limit" />
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from day_recharge_info dri left join game g on dri.gameId=g.gameId where dri.id = #{id}
+  </select>
+  
+  <insert id="insert" parameterType="com.huizhi.dass.model.operation.DayRechargeInfo" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into day_recharge_info (type, gameId, channelId, date, money)
+    values (#{type}, #{gameId}, #{channelId}, #{date}, #{money})
+  </insert>
+  
+  <select id="selectCountByExample" parameterType="com.huizhi.dass.model.Criteria" resultType="java.lang.Integer" >
+    select count(*) from day_recharge_info dri
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByPrimaryKey" parameterType="com.huizhi.dass.model.operation.DayRechargeInfo" >
+    update day_recharge_info
+    <set >
+      <if test="type != null" >
+        type = #{type},
+      </if>
+      <if test="gameId != null" >
+        gameId = #{gameId},
+      </if>
+      <if test="channelId != null" >
+        channelId = #{channelId},
+      </if>
+      <if test="date != null" >
+        date = #{date},
+      </if>
+      <if test="money != null" >
+        money = #{money},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+  <update id="updateAuditByPrimaryKey" parameterType="com.huizhi.dass.model.operation.DayRechargeInfo" >
+    update day_recharge_info
+    <set >
+      <if test="audit != null" >
+        audit = #{audit},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  
+  
+</mapper>

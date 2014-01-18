@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huizhi.dass.operation.dao.RechargeLogDAO" >
+  <resultMap id="BaseResultMap" type="com.huizhi.dass.model.operation.RechargeLog" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="userId" property="userId" jdbcType="VARCHAR" />
+    <result column="gameId" property="gameId" jdbcType="INTEGER" />
+    <result column="channelId" property="channelId" jdbcType="INTEGER" />
+    <result column="deviceId" property="deviceId" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="money" property="money" jdbcType="DECIMAL" />
+    <result column="operateTime" property="operateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="condition.userId != null" >
+         and userId = #{condition.userId}
+      </if>
+      <if test="condition.audit != null" >
+         and audit = #{condition.audit}
+      </if>
+      <if test="condition.gameId != null" >
+         and gameId = #{condition.gameId}
+      </if>
+      <if test="condition.channelId != null" >
+         and channelId = #{condition.channelId}
+      </if>
+      <if test="condition.deviceId != null" >
+         and deviceId = #{condition.deviceId}
+      </if>
+      <if test="condition.startTime != null" >
+         and operateTime &gt;= #{condition.startTime}
+      </if>
+      <if test="condition.endTime != null" >
+         and operateTime &lt; #{condition.endTime}
+      </if>
+      
+    </trim>
+  </sql>
+  
+  <sql id="Example_Order_Clause">
+  	<trim prefix="order by" prefixOverrides="," >
+  		<if test="orderMap.id != null">
+  			,id #{orderMap.id}
+  		</if>
+  		<if test="orderMap.userId != null">
+  			,userId #{orderMap.userId}
+  		</if>
+  		<if test="orderMap.gameId != null" >
+         , gameId 
+         <if test="orderMap.gameId == false" >
+			false         
+      	</if>
+      </if>
+  		<if test="orderMap.channelId != null" >
+         , channelId #{orderMap.channelId}
+      </if>
+  		<if test="orderMap.operateTime != null" >
+         , operateTime
+         	<if test="orderMap.operateTime == false" >
+    			false
+	      </if>
+      </if>
+  	</trim>
+  </sql>
+  
+  <sql id="Base_Column_List" >
+    id, userId, type, gameId, channelId, deviceId, money, operateTime, gameName
+  </sql>
+  
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.huizhi.dass.model.Criteria" >
+    select
+    <include refid="Base_Column_List" />
+    from recharge_log
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="_parameter != null" >
+      <include refid="Example_Order_Clause" />
+    </if>
+    <include refid="common.Mysql_Pagination_Limit" />
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from recharge_log where id = #{id}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from recharge_log where id = #{id}
+  </delete>
+
+  <delete id="delete" >
+    delete from recharge_log
+  </delete>
+  
+  <insert id="insert" parameterType="com.huizhi.dass.model.operation.RechargeLog" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into recharge_log (userId, type, gameId, channelId, deviceId, operateTime)
+    values (#{userId}, #{type}, #{gameId}, #{channelId}, #{deviceId}, #{operateTime})
+  </insert>
+
+  <insert id="insertList">
+    insert into recharge_log (userId, type, gameId, channelId, deviceId, operateTime, money)
+    values 
+    <foreach collection="list" index="index" item="item" separator=","> 
+    	(#{item.userId}, #{item.type}, #{item.gameId}, #{item.channelId}, #{item.deviceId}, #{item.operateTime}, #{item.money})
+    </foreach>
+    
+    
+  </insert>
+  
+  <select id="countByExample" parameterType="com.huizhi.dass.model.Criteria" resultType="java.lang.Integer" >
+    select count(*) from recharge_log
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByPrimaryKey" parameterType="com.huizhi.dass.model.operation.RechargeLog" >
+    update recharge_log
+    <set >
+      <if test="userId != null" >
+        userId = #{userId},
+      </if>
+      <if test="type != null" >
+        type = #{type},
+      </if>
+      <if test="gameId != null" >
+        gameId = #{gameId},
+      </if>
+      <if test="channelId != null" >
+        channelId = #{channelId},
+      </if>
+      <if test="deviceId != null" >
+        deviceId = #{deviceId},
+      </if>
+      <if test="operateTime != null" >
+        operateTime = #{operateTime},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+  
+  
+</mapper>
